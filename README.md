@@ -1,11 +1,17 @@
 # Local development
 
-Install [pipenv] https://github.com/pypa/pipenv
+Use Docker for all your needs
 
 ### Install dependencies
 
 ```
-make install-dev
+make setup
+```
+
+### Run the model
+
+```
+make run
 ```
 
 ### Use the pre-trained model
