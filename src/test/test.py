@@ -12,20 +12,25 @@ IMAGE_SIZE = 128
 LOCAL_SIZE = 64
 HOLE_MIN = 24
 HOLE_MAX = 48
-BATCH_SIZE = 1 # increase this with more training data
+BATCH_SIZE = 1  # increase this with more training data
 PRETRAIN_EPOCH = 100
 
 test_npy = '../../data/npy/x_test.npy'
 
+
 def test():
     x = tf.placeholder(tf.float32, [BATCH_SIZE, IMAGE_SIZE, IMAGE_SIZE, 3])
     mask = tf.placeholder(tf.float32, [BATCH_SIZE, IMAGE_SIZE, IMAGE_SIZE, 1])
-    local_x = tf.placeholder(tf.float32, [BATCH_SIZE, LOCAL_SIZE, LOCAL_SIZE, 3])
-    global_completion = tf.placeholder(tf.float32, [BATCH_SIZE, IMAGE_SIZE, IMAGE_SIZE, 3])
-    local_completion = tf.placeholder(tf.float32, [BATCH_SIZE, LOCAL_SIZE, LOCAL_SIZE, 3])
+    local_x = tf.placeholder(
+        tf.float32, [BATCH_SIZE, LOCAL_SIZE, LOCAL_SIZE, 3])
+    global_completion = tf.placeholder(
+        tf.float32, [BATCH_SIZE, IMAGE_SIZE, IMAGE_SIZE, 3])
+    local_completion = tf.placeholder(
+        tf.float32, [BATCH_SIZE, LOCAL_SIZE, LOCAL_SIZE, 3])
     is_training = tf.placeholder(tf.bool, [])
 
-    model = Network(x, mask, local_x, global_completion, local_completion, is_training, batch_size=BATCH_SIZE)
+    model = Network(x, mask, local_x, global_completion,
+                    local_completion, is_training, batch_size=BATCH_SIZE)
     sess = tf.Session()
     init_op = tf.global_variables_initializer()
     sess.run(init_op)
@@ -42,16 +47,19 @@ def test():
     for i in tqdm.tqdm(range(step_num)):
         x_batch = x_test[i * BATCH_SIZE:(i + 1) * BATCH_SIZE]
         _, mask_batch = get_points()
-        completion = sess.run(model.completion, feed_dict={x: x_batch, mask: mask_batch, is_training: False})
+        completion = sess.run(model.completion, feed_dict={
+                              x: x_batch, mask: mask_batch, is_training: False})
         for i in range(BATCH_SIZE):
             cnt += 1
             raw = x_batch[i]
             raw = np.array((raw + 1) * 127.5, dtype=np.uint8)
-            masked = raw * (1 - mask_batch[i]) + np.ones_like(raw) * mask_batch[i] * 255
+            masked = raw * (1 - mask_batch[i]) + \
+                np.ones_like(raw) * mask_batch[i] * 255
             img = completion[i]
             img = np.array((img + 1) * 127.5, dtype=np.uint8)
             dst = './output/{}.png'.format("{0:06d}".format(cnt))
-            output_image([['Input', masked], ['Output', img], ['Ground Truth', raw]], dst)
+            output_image([['Input', masked], ['Output', img],
+                          ['Ground Truth', raw]], dst)
 
 
 def get_points():
@@ -67,13 +75,13 @@ def get_points():
         q1 = y1 + np.random.randint(0, LOCAL_SIZE - h)
         p2 = p1 + w
         q2 = q1 + h
-        
+
         m = np.zeros((IMAGE_SIZE, IMAGE_SIZE, 1), dtype=np.uint8)
         m[q1:q2 + 1, p1:p2 + 1] = 1
         mask.append(m)
 
     return np.array(points), np.array(mask)
-    
+
 
 def output_image(images, dst):
     fig = plt.figure()
@@ -92,4 +100,3 @@ def output_image(images, dst):
 
 if __name__ == '__main__':
     test()
-    
