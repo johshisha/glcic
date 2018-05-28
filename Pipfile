@@ -11,6 +11,7 @@ matplotlib = "*"
 cmake = "*"
 boost = "*"
 dlib = "*"
+pipenv-package-requirements = "*"
 
 [dev-packages]
 pylint = "*"

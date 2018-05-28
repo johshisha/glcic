@@ -1,5 +1,14 @@
 all: install-dev activate-environment generate-npy run-test
 
+setup:
+	docker build . -t fill-in-my-blank
+
+run:
+	docker run --volume "$$PWD":/code -ti fill-in-my-blank python src/test.py 
+
+shell:
+	docker run --volume "$$PWD":/code -ti fill-in-my-blank /bin/bash
+
 install-dev:
 	brew install pipenv | true
 	pipenv install --dev
@@ -12,6 +21,6 @@ activate-environment:
 generate-npy: activate-environment
 	cd ./data ; python to_npy.py
 	
-run-test: activate-environment
+run-test:
 	cd ./src/test ; python test.py
 

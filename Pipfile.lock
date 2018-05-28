@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "08cd02ae685eb66383f997c1cbbed9a4380019ce02b4aeda6f98fd2261eda132"
+            "sha256": "292d48d48f1980351c47dc0c65225845512f73b452aa19319cc3c222a04416c0"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -229,6 +229,21 @@
             "index": "pypi",
             "version": "==3.4.1.15"
         },
+        "pipenv": {
+            "hashes": [
+                "sha256:04b9a8b02a3ff12a5502b335850cfdb192adcfd1d6bbdb7a7c47cae9ab9ddece",
+                "sha256:e96d5bfa6822a17b2200d455aa5f9002c14361c50df1b1e51921479d7c09e741"
+            ],
+            "version": "==2018.5.18"
+        },
+        "pipenv-package-requirements": {
+            "hashes": [
+                "sha256:24030cd21b842cc2e592fdf74633a5d3d3deb6600288e9496426321dc56009dc",
+                "sha256:33dfc1ead3c381200f7c41c4c027f3dda6d9e7b1c506939e1626f079f6924db0"
+            ],
+            "index": "pypi",
+            "version": "==0.2"
+        },
         "protobuf": {
             "hashes": [
                 "sha256:01ccd6d03449ae75b779fb5bf4ed62177d61afe3c5e6465ccf3f8b2e1a84afbe",
@@ -339,6 +354,20 @@
                 "sha256:cc44da8e1145637334317feebd728bd869a35285b93cbb4cca2577da7e62db4f"
             ],
             "version": "==1.22"
+        },
+        "virtualenv": {
+            "hashes": [
+                "sha256:2ce32cd126117ce2c539f0134eb89de91a8413a29baac49cbab3eb50e2026669",
+                "sha256:ca07b4c0b54e14a91af9f34d0919790b016923d157afda5efdde55c96718f752"
+            ],
+            "version": "==16.0.0"
+        },
+        "virtualenv-clone": {
+            "hashes": [
+                "sha256:4507071d81013fd03ea9930ec26bc8648b997927a11fa80e8ee81198b57e0ac7",
+                "sha256:b5cfe535d14dc68dfc1d1bb4ac1209ea28235b91156e2bba8e250d291c3fb4f8"
+            ],
+            "version": "==0.3.0"
         },
         "werkzeug": {
             "hashes": [
