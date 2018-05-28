@@ -18,11 +18,11 @@ x = np.array(x, dtype=np.uint8)
 np.random.shuffle(x)
 
 p = int(ratio * len(x))
-x_train = x[:p]
-x_test = x[p:]
+# x_train = x[:p] # Dont do this without a lot of pictures
+x_test = x
 
 if not os.path.exists('./npy'):
     os.mkdir('./npy')
-np.save('./npy/x_train.npy', x_train)
+# np.save('./npy/x_train.npy', x_train)
 np.save('./npy/x_test.npy', x_test)
 
