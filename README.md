@@ -5,14 +5,7 @@ Install [pipenv] https://github.com/pypa/pipenv
 ### Install dependencies
 
 ```
-# Dependencies
-pipenv install --dev
-
-# matplotlib needs to understand our virtualenv python
-echo "backend: TkAgg" >> ~/.matplotlib/matplotlibrc
-
-# Go into the shell
-pipenv shell
+make install-dev
 ```
 
 ### Use the pre-trained model
