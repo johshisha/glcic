@@ -1,3 +1,26 @@
+# Local development
+
+Install [pipenv] https://github.com/pypa/pipenv
+
+### Install dependencies
+
+```
+# Dependencies
+pipenv install --dev
+
+# matplotlib needs to understand our virtualenv python
+echo "backend: TkAgg" >> ~/.matplotlib/matplotlibrc
+
+# Go into the shell
+pipenv shell
+```
+
+### Use the pre-trained model
+
+1.  Download [glcic_model.tar.gz](https://drive.google.com/open?id=1jvP2czv_gX8Q1l0tUPNWLV8HLacK6n_Q)
+2.  Extract
+3.  Copy contents into `src/backup`
+
 # Globally and Locally Consistent Image Completion (GLCIC)
 
 This is an implementation of the image completion model proposed in the paper
