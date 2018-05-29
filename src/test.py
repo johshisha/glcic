@@ -6,15 +6,37 @@ import os
 import matplotlib.pyplot as plt
 import sys
 from network import Network
-
+import glob
+import random
 IMAGE_SIZE = 128
 LOCAL_SIZE = 64
 HOLE_MIN = 24
 HOLE_MAX = 48
 BATCH_SIZE = 1  # increase this with more training data
 PRETRAIN_EPOCH = 100
+#test_npy = '../../data/npy/x_test.npy'
 
-test_npy = 'data/npy/x_test.npy'
+
+def old_to_npy():
+    ratio = 0.95
+    image_size = IMAGE_SIZE
+    all_image_data = []
+    paths = glob.glob('data/images/*')
+    for path in paths:
+        img = cv2.imread(path)
+        img = cv2.resize(img, (image_size, image_size))
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        all_image_data.append((path, img))
+#    x = np.array(x, dtype=np.uint8)
+    # np.random.shuffle(x)
+    #p = int(ratio * len(x))
+    # x_train = x[:p] # Dont do this without a lot of pictures
+    #x_test = x
+    if not os.path.exists('./npy'):
+        os.mkdir('./npy')
+    # np.save('./npy/x_train.npy', x_train)
+#    np.save('./npy/x_test.npy', x_test)
+    return all_image_data
 
 
 def test():
@@ -27,23 +49,25 @@ def test():
     local_completion = tf.placeholder(
         tf.float32, [BATCH_SIZE, LOCAL_SIZE, LOCAL_SIZE, 3])
     is_training = tf.placeholder(tf.bool, [])
-
     model = Network(x, mask, local_x, global_completion,
                     local_completion, is_training, batch_size=BATCH_SIZE)
     sess = tf.Session()
     init_op = tf.global_variables_initializer()
     sess.run(init_op)
-
     saver = tf.train.Saver()
     saver.restore(sess, 'src/backup/latest')
+    #x_test = np.load(test_npy)
+    datas = old_to_npy()
+    random.shuffle(datas)
+    paths, imgs = zip(*datas)
+    x_test = np.array(imgs, dtype=np.uint8)
 
-    x_test = np.load(test_npy)
     np.random.shuffle(x_test)
     x_test = np.array([a / 127.5 - 1 for a in x_test])
-
     step_num = int(len(x_test) / BATCH_SIZE)
     cnt = 0
     for i in tqdm.tqdm(range(step_num)):
+        print(paths[i])
         x_batch = x_test[i * BATCH_SIZE:(i + 1) * BATCH_SIZE]
         _, mask_batch = get_points()
         completion = sess.run(model.completion, feed_dict={
@@ -69,17 +93,14 @@ def get_points():
         x1, y1 = (IMAGE_SIZE / 2) - BOX_SIZE, (IMAGE_SIZE / 2) - BOX_SIZE
         x2, y2 = (IMAGE_SIZE / 2) + BOX_SIZE, (IMAGE_SIZE / 2) + BOX_SIZE
         points.append([x1, y1, x2, y2])
-
         w, h = BOX_SIZE * 2, BOX_SIZE * 2
         p1 = np.int(x1)
         q1 = np.int(y1)
         p2 = p1 + w
         q2 = q1 + h
-
         m = np.zeros((IMAGE_SIZE, IMAGE_SIZE, 1), dtype=np.uint8)
         m[q1:q2 + 1, p1:p2 + 1] = 1
         mask.append(m)
-
     return np.array(points), np.array(mask)
 
 
