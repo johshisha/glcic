@@ -5,9 +5,8 @@ import numpy as np
 
 ratio = 0.95
 image_size = 128
-
 x = []
-paths = glob.glob('./images/*')
+paths = glob.glob('data/images/*')
 for path in paths:
     img = cv2.imread(path)
     img = cv2.resize(img, (image_size, image_size))
@@ -21,8 +20,7 @@ p = int(ratio * len(x))
 # x_train = x[:p] # Dont do this without a lot of pictures
 x_test = x
 
-if not os.path.exists('./npy'):
-    os.mkdir('./npy')
+if not os.path.exists('data/npy'):
+    os.mkdir('data/npy')
 # np.save('./npy/x_train.npy', x_train)
-np.save('./npy/x_test.npy', x_test)
-
+np.save('data/npy/x_test.npy', x_test)
