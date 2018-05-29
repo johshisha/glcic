@@ -32,8 +32,8 @@ def old_to_npy():
     #p = int(ratio * len(x))
     # x_train = x[:p] # Dont do this without a lot of pictures
     #x_test = x
-    if not os.path.exists('./npy'):
-        os.mkdir('./npy')
+    # if not os.path.exists('./npy'):
+        # os.mkdir('./npy')
     # np.save('./npy/x_train.npy', x_train)
 #    np.save('./npy/x_test.npy', x_test)
     return all_image_data
@@ -69,7 +69,7 @@ def test():
     for i in tqdm.tqdm(range(step_num)):
         print(paths[i])
         x_batch = x_test[i * BATCH_SIZE:(i + 1) * BATCH_SIZE]
-        _, mask_batch = get_points()
+        mask_batch = get_points(paths[i])
         completion = sess.run(model.completion, feed_dict={
                               x: x_batch, mask: mask_batch, is_training: False})
         for i in range(BATCH_SIZE):
@@ -85,23 +85,41 @@ def test():
                           ['Ground Truth', raw]], dst)
 
 
-def get_points():
+def get_points(path):
     points = []
+    point_dicts = get_point_dict(path)
     mask = []
+    # mask = point_dict.values()
     for i in range(BATCH_SIZE):
-        BOX_SIZE = 25
-        x1, y1 = (IMAGE_SIZE / 2) - BOX_SIZE, (IMAGE_SIZE / 2) - BOX_SIZE
-        x2, y2 = (IMAGE_SIZE / 2) + BOX_SIZE, (IMAGE_SIZE / 2) + BOX_SIZE
-        points.append([x1, y1, x2, y2])
-        w, h = BOX_SIZE * 2, BOX_SIZE * 2
-        p1 = np.int(x1)
-        q1 = np.int(y1)
-        p2 = p1 + w
-        q2 = q1 + h
-        m = np.zeros((IMAGE_SIZE, IMAGE_SIZE, 1), dtype=np.uint8)
-        m[q1:q2 + 1, p1:p2 + 1] = 1
-        mask.append(m)
-    return np.array(points), np.array(mask)
+        for point_dict in point_dicts.values():
+            points = point_dict.values()
+
+            for point in points:
+                # point = [95, 300, 325, 31]
+                print(point)
+                # point = [x, y, w, h]
+                BOX_SIZE = 25
+                w, h = point[2], point[3]
+                x1, y1 = point[0], point[1]
+                x2, y2 = x1 + w, y1 + h
+                # points.append([x1, y1, x2, y2])
+                p1 = np.int(x1)
+                q1 = np.int(y1)
+                p2 = p1 + w
+                q2 = q1 + h
+                m = np.zeros((IMAGE_SIZE, IMAGE_SIZE, 1), dtype=np.uint8)
+                m[q1:q2 + 1, p1:p2 + 1] = 1
+                mask.append(m)
+    return np.array(mask)
+
+
+def get_point_dict(image_path):
+    IMAGE_FOLDER = 'images'
+    COORDINATE_FOLDER = 'coordinates'
+    point_path = image_path.replace(IMAGE_FOLDER, COORDINATE_FOLDER)
+    point_path = point_path.replace('png', 'npy')
+    point_ndarray = np.load(point_path)
+    return dict(np.ndenumerate(point_ndarray))
 
 
 def output_image(images, dst):
