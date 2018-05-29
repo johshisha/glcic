@@ -65,13 +65,14 @@ def get_points():
     points = []
     mask = []
     for i in range(BATCH_SIZE):
-        x1, y1 = np.random.randint(0, IMAGE_SIZE - LOCAL_SIZE + 1, 2)
-        x2, y2 = np.array([x1, y1]) + LOCAL_SIZE
+        BOX_SIZE = 25
+        x1, y1 = (IMAGE_SIZE / 2) - BOX_SIZE, (IMAGE_SIZE / 2) - BOX_SIZE
+        x2, y2 = (IMAGE_SIZE / 2) + BOX_SIZE, (IMAGE_SIZE / 2) + BOX_SIZE
         points.append([x1, y1, x2, y2])
 
-        w, h = np.random.randint(HOLE_MIN, HOLE_MAX + 1, 2)
-        p1 = x1 + np.random.randint(0, LOCAL_SIZE - w)
-        q1 = y1 + np.random.randint(0, LOCAL_SIZE - h)
+        w, h = BOX_SIZE * 2, BOX_SIZE * 2
+        p1 = np.int(x1)
+        q1 = np.int(y1)
         p2 = p1 + w
         q2 = q1 + h
 
