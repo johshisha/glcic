@@ -24,9 +24,10 @@ def old_to_npy():
     paths = glob.glob('data/images/*')
     for path in paths:
         img = cv2.imread(path)
+        original_shape = img.shape
         img = cv2.resize(img, (image_size, image_size))
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        all_image_data.append((path, img))
+        all_image_data.append((path, img, original_shape))
 #    x = np.array(x, dtype=np.uint8)
     # np.random.shuffle(x)
     #p = int(ratio * len(x))
@@ -40,8 +41,15 @@ def old_to_npy():
 
 
 def test():
-    x = tf.placeholder(tf.float32, [BATCH_SIZE, IMAGE_SIZE, IMAGE_SIZE, 3])
-    mask = tf.placeholder(tf.float32, [BATCH_SIZE, IMAGE_SIZE, IMAGE_SIZE, 1])
+    datas = old_to_npy()
+    random.shuffle(datas)
+    paths, imgs, original_shapes = zip(*datas)
+    number_of_images = len(paths)
+    number_of_boxes = number_of_images * 2
+    x = tf.placeholder(
+        tf.float32, [BATCH_SIZE, IMAGE_SIZE, IMAGE_SIZE, 3])
+    mask = tf.placeholder(
+        tf.float32, [BATCH_SIZE, IMAGE_SIZE, IMAGE_SIZE, 1])
     local_x = tf.placeholder(
         tf.float32, [BATCH_SIZE, LOCAL_SIZE, LOCAL_SIZE, 3])
     global_completion = tf.placeholder(
@@ -57,19 +65,16 @@ def test():
     saver = tf.train.Saver()
     saver.restore(sess, 'src/backup/latest')
     #x_test = np.load(test_npy)
-    datas = old_to_npy()
-    random.shuffle(datas)
-    paths, imgs = zip(*datas)
     x_test = np.array(imgs, dtype=np.uint8)
 
-    np.random.shuffle(x_test)
+    # np.random.shuffle(x_test)
     x_test = np.array([a / 127.5 - 1 for a in x_test])
     step_num = int(len(x_test) / BATCH_SIZE)
     cnt = 0
+
     for i in tqdm.tqdm(range(step_num)):
-        print(paths[i])
         x_batch = x_test[i * BATCH_SIZE:(i + 1) * BATCH_SIZE]
-        mask_batch = get_points(paths[i])
+        mask_batch = get_points(paths[i], original_shapes[i])
         completion = sess.run(model.completion, feed_dict={
                               x: x_batch, mask: mask_batch, is_training: False})
         for i in range(BATCH_SIZE):
@@ -85,32 +90,49 @@ def test():
                           ['Ground Truth', raw]], dst)
 
 
-def get_points(path):
+def get_points(path, original_shape):
     points = []
     point_dicts = get_point_dict(path)
+
+    original_h, original_w, _ = original_shape
+    width_scale = original_w / IMAGE_SIZE
+    height_scale = original_h / IMAGE_SIZE
     mask = []
     # mask = point_dict.values()
     for i in range(BATCH_SIZE):
+
         for point_dict in point_dicts.values():
+
             points = point_dict.values()
 
             for point in points:
+
                 # point = [95, 300, 325, 31]
-                print(point)
+
+                x1, y1, w, h = point
+
+                h = h / height_scale
+                w = w / width_scale
+                x1 = x1 / width_scale
+                y1 = y1 / height_scale
+
                 # point = [x, y, w, h]
                 BOX_SIZE = 25
-                w, h = point[2], point[3]
-                x1, y1 = point[0], point[1]
+                #w, h = point[2], point[3]
+                #x1, y1 = point[0], point[1]
+
                 x2, y2 = x1 + w, y1 + h
                 # points.append([x1, y1, x2, y2])
                 p1 = np.int(x1)
                 q1 = np.int(y1)
-                p2 = p1 + w
-                q2 = q1 + h
+                p2 = p1 + np.int(w)
+                q2 = q1 + np.int(h)
+                print("COORDS")
+                print(p1, q1, p2, q2)
                 m = np.zeros((IMAGE_SIZE, IMAGE_SIZE, 1), dtype=np.uint8)
                 m[q1:q2 + 1, p1:p2 + 1] = 1
                 mask.append(m)
-    return np.array(mask)
+    return np.array(mask[:1])
 
 
 def get_point_dict(image_path):
