@@ -5,7 +5,6 @@ import tqdm
 import os
 import matplotlib.pyplot as plt
 import sys
-sys.path.append('..')
 from network import Network
 
 IMAGE_SIZE = 128
@@ -15,7 +14,7 @@ HOLE_MAX = 48
 BATCH_SIZE = 1  # increase this with more training data
 PRETRAIN_EPOCH = 100
 
-test_npy = '../../data/npy/x_test.npy'
+test_npy = 'data/npy/x_test.npy'
 
 
 def test():
@@ -36,7 +35,7 @@ def test():
     sess.run(init_op)
 
     saver = tf.train.Saver()
-    saver.restore(sess, '../backup/latest')
+    saver.restore(sess, 'src/backup/latest')
 
     x_test = np.load(test_npy)
     np.random.shuffle(x_test)
@@ -57,7 +56,7 @@ def test():
                 np.ones_like(raw) * mask_batch[i] * 255
             img = completion[i]
             img = np.array((img + 1) * 127.5, dtype=np.uint8)
-            dst = './output/{}.png'.format("{0:06d}".format(cnt))
+            dst = 'src/test/output/{}.png'.format("{0:06d}".format(cnt))
             output_image([['Input', masked], ['Output', img],
                           ['Ground Truth', raw]], dst)
 
