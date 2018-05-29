@@ -10,4 +10,5 @@ RUN mkdir -p /root/.config/matplotlib
 RUN echo "backend : Agg" > /root/.config/matplotlib/matplotlibrc
 
 WORKDIR /code
-COPY . /code
+
+CMD [ "python", "src/test.py" ]
