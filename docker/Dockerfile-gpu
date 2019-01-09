@@ -1,7 +1,17 @@
-FROM python:3.6.5-jessie
+FROM nvidia/cuda:9.0-cudnn7-devel-ubuntu16.04
 
-RUN apt-get update
-RUN apt-get install -y cmake
+# Install git, wget, bc and dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    iproute2 \
+    wget \
+    python3.5 \
+    python3-pip \
+    python3-dev \
+    libmysqlclient-dev \
+    cmake
+RUN apt-get install -y --allow-downgrades --no-install-recommends \
+  libcudnn7=7.0.5.15-1+cuda9.0 libcudnn7-dev=7.0.5.15-1+cuda9.0 && rm -rf /var/lib/apt/lists/*
 
 ADD requirements.txt ./
 RUN pip3 install -r requirements.txt
