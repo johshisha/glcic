@@ -9,7 +9,7 @@ from network import Network
 
 IMAGE_SIZE = 128
 LOCAL_SIZE = 64
-HOLE_MIN = 24
+HOLE_MIN = 12
 HOLE_MAX = 48
 BATCH_SIZE = 1  # increase this with more training data
 PRETRAIN_EPOCH = 100

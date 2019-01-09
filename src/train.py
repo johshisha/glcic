@@ -7,7 +7,7 @@ import load
 
 IMAGE_SIZE = 128
 LOCAL_SIZE = 64
-HOLE_MIN = 24
+HOLE_MIN = 12
 HOLE_MAX = 48
 LEARNING_RATE = 1e-3
 BATCH_SIZE = 16
@@ -49,7 +49,7 @@ def train():
 
         np.random.shuffle(x_train)
 
-        # Completion 
+        # Completion
         if sess.run(epoch) <= PRETRAIN_EPOCH:
             g_loss_value = 0
             for i in tqdm.tqdm(range(step_num)):
@@ -61,7 +61,7 @@ def train():
 
             print('Completion loss: {}'.format(g_loss_value))
 
-            np.random.shuffle(x_test) 
+            np.random.shuffle(x_test)
             x_batch = x_test[:BATCH_SIZE]
             completion = sess.run(model.completion, feed_dict={x: x_batch, mask: mask_batch, is_training: False})
             sample = np.array((completion[0] + 1) * 127.5, dtype=np.uint8)
@@ -95,14 +95,14 @@ def train():
                 local_completion_batch = np.array(local_completion_batch)
 
                 _, d_loss = sess.run(
-                    [d_train_op, model.d_loss], 
+                    [d_train_op, model.d_loss],
                     feed_dict={x: x_batch, mask: mask_batch, local_x: local_x_batch, global_completion: completion, local_completion: local_completion_batch, is_training: True})
                 d_loss_value += d_loss
 
             print('Completion loss: {}'.format(g_loss_value))
             print('Discriminator loss: {}'.format(d_loss_value))
 
-            np.random.shuffle(x_test) 
+            np.random.shuffle(x_test)
             x_batch = x_test[:BATCH_SIZE]
             completion = sess.run(model.completion, feed_dict={x: x_batch, mask: mask_batch, is_training: False})
             sample = np.array((completion[0] + 1) * 127.5, dtype=np.uint8)
@@ -125,7 +125,7 @@ def get_points():
         q1 = y1 + np.random.randint(0, LOCAL_SIZE - h)
         p2 = p1 + w
         q2 = q1 + h
-        
+
         m = np.zeros((IMAGE_SIZE, IMAGE_SIZE, 1), dtype=np.uint8)
         m[q1:q2 + 1, p1:p2 + 1] = 1
         mask.append(m)
@@ -136,4 +136,3 @@ def get_points():
 
 if __name__ == '__main__':
     train()
-    

@@ -2,8 +2,11 @@ import glob
 import os
 import cv2
 import numpy as np
+import sys
 
-ratio = 0.95
+mode = sys.argv.get(1) or 'test'
+
+ratio = 0.9
 image_size = 128
 
 x = []
@@ -17,12 +20,16 @@ for path in paths:
 x = np.array(x, dtype=np.uint8)
 np.random.shuffle(x)
 
-p = int(ratio * len(x))
-# x_train = x[:p] # Dont do this without a lot of pictures
-x_test = x
+if mode == 'train':
+    p = int(ratio * len(x))
+    x_train = x[:p] # Dont do this without a lot of pictures
+    x_test = x[p:]
+else:
+    x_test = x
 
 if not os.path.exists('./npy'):
     os.mkdir('./npy')
-# np.save('./npy/x_train.npy', x_train)
-np.save('./npy/x_test.npy', x_test)
 
+if mode == 'train':
+    np.save('./npy/x_train.npy', x_train)
+np.save('./npy/x_test.npy', x_test)
