@@ -4,7 +4,10 @@ import cv2
 import numpy as np
 import sys
 
-mode = sys.argv.get(1) or 'test'
+if len(sys.argv) < 2:
+    mode = 'test'
+else:
+    mode = sys.argv[1]
 
 ratio = 0.9
 image_size = 128
